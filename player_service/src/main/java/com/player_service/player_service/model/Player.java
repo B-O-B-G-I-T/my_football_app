@@ -1,3 +1,4 @@
+package com.player_service.player_service.model;
 
 public class Player {
 public int playerId;
