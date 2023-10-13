@@ -1,11 +1,12 @@
 package com.team_service.team_service.model;
 
-
 public class Team {
-public int teamId;
-public String teamName;
 
-    public Team(int id, String name){
+    public int teamId;
+
+    public String teamName;
+
+    public Team(int id, String name) {
         teamId = id;
         teamName = name;
     }

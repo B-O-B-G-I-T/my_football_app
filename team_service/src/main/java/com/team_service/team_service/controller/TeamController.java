@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import com.team_service.team_service.model.Team;
 
 @RestController
-@RequestMapping("/teams")
 public class TeamController {
 
     static ArrayList<Team> listeTeams = new ArrayList<Team>() {
@@ -22,7 +21,10 @@ public class TeamController {
         }
     };
 
-    @GetMapping("/{id}")
+
+    //@GetMapping("/{id}")
+    //@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/teams/{id}")
     public ResponseEntity<Team> getTeam(@PathVariable int id) {
         for (Team team : listeTeams) {
             if (team.getId() == id) {
@@ -32,14 +34,27 @@ public class TeamController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
+//     //@GetMapping("/{id}")
+//    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+//     public ResponseEntity<Team> getTeam(@PathVariable int id) {
+//         for (Team team : listeTeams) {
+//             if (team.getId() == id) {
+//                 return new ResponseEntity<>(team, HttpStatus.OK);
+//             }
+//         }
+//         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//     }
+
+    //@PostMapping
+    @RequestMapping( method = RequestMethod.POST)
     public String createTeam(@RequestBody Map<String, String> teamMap) {
         Team team = new Team(Integer.parseInt(teamMap.get("teamId")), teamMap.get("teamName"));
         listeTeams.add(team);
         return "Équipe créée : " + team.getName();
     }
 
-    @PutMapping("/{id}")
+    //@PutMapping("/{id}")
+   @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Team> updateTeam(@PathVariable int id, @RequestBody Team team) {
         for (Team currentTeam : listeTeams) {
             if (currentTeam.getId() == id) {
@@ -50,7 +65,8 @@ public class TeamController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/{id}")
+    //@DeleteMapping("/{id}")
+   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteTeam(@PathVariable int id) {
         for (Team team : listeTeams) {
             if (team.getId() == id) {
