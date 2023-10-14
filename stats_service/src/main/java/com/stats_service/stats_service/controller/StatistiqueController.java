@@ -1,10 +1,10 @@
-package com.stat_service.stats_service.controller;
+package com.stats_service.stats_service.controller;
+
 import java.util.ArrayList;
 import java.util.Optional;
-
 import org.springframework.web.bind.annotation.*;
+import com.stats_service.stats_service.model.Statistique;
 
-import com.stat_service.stats_service.model.Statistique;
 
 @RestController
 public class StatistiqueController {

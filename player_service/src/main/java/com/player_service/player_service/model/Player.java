@@ -1,10 +1,15 @@
 package com.player_service.player_service.model;
 
-public class Player {
-public int playerId;
-public String playerName;
 
-    public Player(int id, String name){
+public class Player {
+
+    int playerId;
+    String playerName;
+    int pointMarque;
+    int nombreDeMatchJoue;
+    
+
+    public Player(int id, String name) {
         playerId = id;
         playerName = name;
     }

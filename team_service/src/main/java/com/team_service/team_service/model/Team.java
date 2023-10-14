@@ -1,5 +1,6 @@
 package com.team_service.team_service.model;
 
+
 public class Team {
 
     public int teamId;

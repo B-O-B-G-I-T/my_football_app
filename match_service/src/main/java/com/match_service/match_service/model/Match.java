@@ -2,12 +2,15 @@ package com.match_service.match_service.model;
 
 
 public class Match {
-public int matchId;
-public String matchName;
 
-    public Match(int id, String name){
+    int matchId;
+    String equipe1;
+    String equipe2;
+
+    public Match(int id, String equipe1, String equipe2) {
         matchId = id;
-        matchName = name;
+        this.equipe1 = equipe1;
+        this.equipe2 = equipe2;
     }
 
     public int getId() {
@@ -15,11 +18,22 @@ public String matchName;
     }
 
     public String getName() {
-        return matchName;
+        return equipe1 + "/" + equipe2;
     }
 
-    public void setName(String name) {
-        matchName = name;
+    public String getNameEquipe1() {
+        return equipe1 ;
+    }
+
+    public void setNameEquipe1(String name) {
+        equipe1 = name;
+    }
+
+    public String getNameEquipe2() {
+        return equipe2 ;
+    }
+    public void setNameEquipe2(String name) {
+        equipe2 = name;
     }
 
 }

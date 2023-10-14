@@ -1,4 +1,5 @@
-package com.stat_service.stats_service.model;
+package com.stats_service.stats_service.model;
+
 
 public class Statistique {
 public int matchId;

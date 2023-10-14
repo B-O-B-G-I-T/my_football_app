@@ -1,4 +1,4 @@
-package com.stat_service.stats_service;
+package com.stats_service.stats_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
