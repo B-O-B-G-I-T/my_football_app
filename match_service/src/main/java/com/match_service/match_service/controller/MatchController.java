@@ -2,9 +2,13 @@ package com.match_service.match_service.controller;
 
 import java.time.Duration;
 import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import com.match_service.match_service.model.Match;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -15,6 +19,14 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 public class MatchController {
 
     private static final CircuitBreaker circuitBreaker;
+
+    @Autowired
+	RestTemplate restTemplate;
+
+
+    public MatchController(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+    }
 
     static {
         CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()

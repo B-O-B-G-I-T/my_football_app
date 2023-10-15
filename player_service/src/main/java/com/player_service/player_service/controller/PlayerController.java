@@ -4,15 +4,18 @@ package com.player_service.player_service.controller;
 
 import java.time.Duration;
 import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import com.player_service.player_service.model.Player;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
-
 
 // Annotation pour indiquer que cette classe est un contrôleur REST
 @RestController
@@ -22,6 +25,13 @@ public class PlayerController {
 
     // Déclaration du circuit breaker
     private static final CircuitBreaker circuitBreaker;
+    
+	@Autowired
+	RestTemplate restTemplate;
+
+    public PlayerController(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+    }
 
     // Configuration du circuit breaker
     static {
@@ -38,10 +48,31 @@ public class PlayerController {
     // Liste des équipes
     static ArrayList<Player> listePlayers = new ArrayList<Player>() {
         {
-            add(new Player(1, "SCB"));
-            add(new Player(2, "PSG"));
-            add(new Player(3, "OM"));
-            add(new Player(4, "ACA"));
+            add(new Player(1, "Jean", 10, 25));
+            add(new Player(2, "François", 15, 30));
+            add(new Player(3, "Dimitri", 20, 35));
+            add(new Player(4, "Pilou", 25, 40));
+            add(new Player(5, "Paul", 30, 45));
+            add(new Player(6, "Jacques", 35, 50));
+            add(new Player(7, "Pierre", 40, 55));
+            add(new Player(8, "David", 45, 60));
+            add(new Player(9, "Lucas", 50, 65));
+            add(new Player(10, "Julien", 55, 70));
+            add(new Player(11, "Nicolas", 60, 75));
+            add(new Player(12, "Jérôme", 65, 80));
+            add(new Player(13, "Guillaume", 70, 85));
+            add(new Player(14, "Benoît", 75, 90));
+            add(new Player(15, "Christophe", 80, 95));
+            add(new Player(16, "Antoine", 85, 100));
+            add(new Player(17, "Vincent", 90, 105));
+            add(new Player(18, "Maxime", 95, 110));
+            add(new Player(19, "Alexandre", 100, 115));
+            add(new Player(20, "Olivier", 105, 120));
+            add(new Player(21, "Thomas", 110, 125));
+            add(new Player(22, "Robert", 115, 130));
+            add(new Player(23, "Patrick", 120, 135));
+            add(new Player(24, "Daniel", 125, 140));
+            add(new Player(25, "Michel", 130, 145));
         }
     };
 
@@ -112,7 +143,7 @@ public class PlayerController {
     // Méthode pour supprimer une équipe existante
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePlayer(@PathVariable int id) {
-           try {
+        try {
             // Utilisation du circuit breaker pour exécuter la méthode deleteExistingPlayer
             return circuitBreaker.executeSupplier(() -> deleteExistingPlayer(id));
         } catch (Exception e) {

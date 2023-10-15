@@ -4,15 +4,20 @@ package com.team_service.team_service.controller;
 
 import java.time.Duration;
 import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.team_service.team_service.model.Team;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
-
 
 // Annotation pour indiquer que cette classe est un contrôleur REST
 @RestController
@@ -22,6 +27,13 @@ public class TeamController {
 
     // Déclaration du circuit breaker
     private static final CircuitBreaker circuitBreaker;
+
+    @Autowired
+    RestTemplate restTemplate;
+
+    public TeamController(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+    }
 
     // Configuration du circuit breaker
     static {
@@ -68,6 +80,33 @@ public class TeamController {
         throw new RuntimeException("Équipe non trouvée");
     }
 
+    // Méthode pour obtenir un joueur par son ID
+    @GetMapping("/player/{id}")
+    public ResponseEntity<String> getPlayer(@PathVariable int id) {
+
+        try {
+            // Utilisation du circuit breaker pour exécuter la méthode getPlayerById
+            return circuitBreaker.executeSupplier(() -> getPlayerById(id));
+        } catch (Exception e) {
+            // En cas d'erreur, on appelle la méthode fallback
+            return fallback("Joueur non trouvé");
+        }
+    }
+
+    // Méthode pour obtenir un joueur par son ID
+    private ResponseEntity<String> getPlayerById(int id) {
+        try {
+            String playersServiceUrl = "http://microservice-player/players/" + id;
+            String player = this.restTemplate.getForObject(playersServiceUrl, String.class);
+            return new ResponseEntity<>(player, HttpStatus.OK);
+        } catch (HttpClientErrorException | HttpServerErrorException httpClientOrServerExc) {
+            if (HttpStatus.NOT_FOUND.equals(httpClientOrServerExc.getStatusCode())) {
+                throw new RuntimeException("Joueur non trouvé");
+            }
+            throw new RuntimeException("Une erreur inattendue s'est produite");
+        }
+    }
+
     // Méthode pour créer une équipe
     @PostMapping
     public ResponseEntity<String> createTeam(@RequestBody Team team) {
@@ -112,7 +151,7 @@ public class TeamController {
     // Méthode pour supprimer une équipe existante
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTeam(@PathVariable int id) {
-           try {
+        try {
             // Utilisation du circuit breaker pour exécuter la méthode deleteExistingTeam
             return circuitBreaker.executeSupplier(() -> deleteExistingTeam(id));
         } catch (Exception e) {
