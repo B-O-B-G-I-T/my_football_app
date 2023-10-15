@@ -22,6 +22,9 @@ import com.team_service.team_service.model.Team;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 
 // Annotation pour indiquer que cette classe est un contrôleur REST
 @RestController
@@ -62,6 +65,7 @@ public class TeamController {
     };
 
     // Méthode pour obtenir une équipe par son ID
+    @Operation(summary = "connaitre l'équipe avec son id")
     @GetMapping("/{id}")
     public ResponseEntity<String> getTeam(@PathVariable int id) {
 
@@ -75,6 +79,7 @@ public class TeamController {
     }
 
     // Méthode pour obtenir une équipe par son ID
+    
     private ResponseEntity<String> getTeamById(int id) {
         for (Team team : listeTeams) {
             if (team.getId() == id) {
@@ -85,6 +90,7 @@ public class TeamController {
     }
     
     @GetMapping("/Stats/{id}")
+    @Operation(summary = "connaitre les stats d'une équipe avec son id")
     public ResponseEntity<String> getTeamStats(@PathVariable int id) {
 
         try {
@@ -125,6 +131,7 @@ public class TeamController {
 
     // Méthode pour obtenir un joueur par son ID
     @GetMapping("/player/{id}")
+    @Operation(summary = "connaitre le joueur avec son id en passant par le server sert a rien")
     public ResponseEntity<String> getPlayer(@PathVariable int id) {
 
         try {
@@ -154,6 +161,7 @@ public class TeamController {
 
     // Méthode pour créer une équipe
     @PostMapping
+    @Operation(summary = "Creer une équipe")
     public ResponseEntity<String> createTeam(@RequestBody Team team) {
         try {
             // Utilisation du circuit breaker pour exécuter la méthode createAndAddTeam
@@ -172,6 +180,7 @@ public class TeamController {
 
     // Méthode pour mettre à jour une équipe existante
     @PutMapping("/{id}")
+    @Operation(summary = "Met à jour l'équipe avec son id")
     public ResponseEntity<String> updateTeam(@PathVariable int id, @RequestBody Team team) {
         try {
             // Utilisation du circuit breaker pour exécuter la méthode updateExistingTeam
@@ -195,6 +204,7 @@ public class TeamController {
 
     // Méthode pour supprimer une équipe existante
     @DeleteMapping("/{id}")
+    @Operation(summary = "Supprime l'équipe avec son id")
     public ResponseEntity<String> deleteTeam(@PathVariable int id) {
         try {
             // Utilisation du circuit breaker pour exécuter la méthode deleteExistingTeam

@@ -1,6 +1,8 @@
 package com.team_service.team_service.model;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Team")
 public class Team {
 
     int teamId;

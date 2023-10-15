@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 public class StatistiqueController {
@@ -40,6 +41,7 @@ public class StatistiqueController {
 
     // Méthode pour obtenir les stats du joueur par son ID
     @GetMapping("/player-stats/{id}")
+    @Operation(summary = "Connaitre les stats d'un joueur avec son id")
     public ResponseEntity<String> getPlayer(@PathVariable int id) {
 
         try {
@@ -52,6 +54,8 @@ public class StatistiqueController {
     }
 
     // Méthode pour obtenir un joueur par son ID
+
+    @Operation(summary = "Connaitre les stats d'une équipe avec son id")
     private ResponseEntity<String> getStatPlayerById(int id) {
         try {
             String playersServiceUrl = "http://microservice-player/players/Stats/" + id;

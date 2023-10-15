@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: player-service
+spec:
+  selector:
+    app: player-service
+  ports:
+    - protocol: TCP
+      port: 6651
+      targetPort: 6651
+  type: LoadBalancer

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serveur-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: serveur-service
+  template:
+    metadata:
+      labels:
+        app: serveur-service
+    spec:
+      containers:
+      - name: serveur-service
+        image: serveur-service:latest
+        ports:
+        - containerPort: 9102

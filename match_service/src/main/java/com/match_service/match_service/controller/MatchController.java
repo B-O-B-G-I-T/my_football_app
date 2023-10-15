@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import com.match_service.match_service.model.Match;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/matchs")
@@ -47,12 +48,13 @@ public class MatchController {
     };
 
     @GetMapping("/{id}")
+    @Operation(summary = "Connaitre le match avec son id")
     public ResponseEntity<String> getMatch(@PathVariable int id) {
 
         try {
             return circuitBreaker.executeSupplier(() -> getMatchById(id));
         } catch (Exception e) {
-            return fallback("Équipe non trouvée");
+            return fallback("Match non trouvée");
         }
     }
 
@@ -62,10 +64,11 @@ public class MatchController {
                 return new ResponseEntity<>(match.getName(), HttpStatus.OK);
             }
         }
-        throw new RuntimeException("Équipe non trouvée");
+        throw new RuntimeException("Match non trouvée");
     }
     
     @PostMapping
+    @Operation(summary = "Créer un match avec son id")
     public ResponseEntity<String> createMatch(@RequestBody Match match) {
         try {
             return circuitBreaker.executeSupplier(() -> createAndAddMatch(match));
@@ -76,10 +79,11 @@ public class MatchController {
 
     private ResponseEntity<String> createAndAddMatch(Match match) {
         listeMatchs.add(match);
-        return new ResponseEntity<>("Équipe créée : " + match.getName(), HttpStatus.CREATED);
+        return new ResponseEntity<>("Match créée : " + match.getName(), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Met à jour le match avec son id")
     public ResponseEntity<String> updateMatch(@PathVariable int id, @RequestBody Match match) {
         try {
             return circuitBreaker.executeSupplier(() -> updateExistingMatch(id, match));
@@ -96,11 +100,12 @@ public class MatchController {
                 return new ResponseEntity<String>(currentMatch.getName(), HttpStatus.OK);
             }
         }
-        throw new RuntimeException("Équipe non trouvée");
+        throw new RuntimeException("Match non trouvée");
     }
 
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Supprimer le match avec son id")
     public ResponseEntity<String> deleteMatch(@PathVariable int id) {
         try {
             return circuitBreaker.executeSupplier(() -> deleteExistingMatch(id));
@@ -116,7 +121,7 @@ public class MatchController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
         }
-        throw new RuntimeException("Équipe non trouvée");
+        throw new RuntimeException("Match non trouvée");
     }
 
 
