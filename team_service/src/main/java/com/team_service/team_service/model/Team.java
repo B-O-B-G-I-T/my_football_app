@@ -3,13 +3,17 @@ package com.team_service.team_service.model;
 
 public class Team {
 
-    public int teamId;
+    int teamId;
+    String teamName;
+    int nombreDeMatchJoue;
+    int pointMarque;
 
-    public String teamName;
 
-    public Team(int id, String name) {
+    public Team(int id, String name, int nombreDeMatchJoue, int pointMarque) {
         teamId = id;
         teamName = name;
+        this.nombreDeMatchJoue = nombreDeMatchJoue;
+        this.pointMarque = pointMarque;
     }
 
     public int getId() {
@@ -22,6 +26,14 @@ public class Team {
 
     public void setName(String name) {
         teamName = name;
+    }
+
+    public int getNombreDeMatchJoue() {
+        return nombreDeMatchJoue;
+    }
+
+    public int getPointMarque() {
+        return pointMarque;
     }
 
 }

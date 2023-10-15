@@ -4,6 +4,8 @@ package com.team_service.team_service.controller;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -14,6 +16,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team_service.team_service.model.Team;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -25,15 +29,15 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 @RequestMapping("/teams")
 public class TeamController {
 
-    // Déclaration du circuit breaker
-    private static final CircuitBreaker circuitBreaker;
-
     @Autowired
     RestTemplate restTemplate;
 
     public TeamController(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
+
+    // Déclaration du circuit breaker
+    private static final CircuitBreaker circuitBreaker;
 
     // Configuration du circuit breaker
     static {
@@ -50,10 +54,10 @@ public class TeamController {
     // Liste des équipes
     static ArrayList<Team> listeTeams = new ArrayList<Team>() {
         {
-            add(new Team(1, "SCB"));
-            add(new Team(2, "PSG"));
-            add(new Team(3, "OM"));
-            add(new Team(4, "ACA"));
+            add(new Team(1, "SCB", 10,0));
+            add(new Team(2, "PSG", 0,0));
+            add(new Team(3, "OM",5,4));
+            add(new Team(4, "ACA", 10,10));
         }
     };
 
@@ -74,11 +78,50 @@ public class TeamController {
     private ResponseEntity<String> getTeamById(int id) {
         for (Team team : listeTeams) {
             if (team.getId() == id) {
-                return new ResponseEntity<>(team.teamName, HttpStatus.OK);
+                return new ResponseEntity<>(team.getName(), HttpStatus.OK);
             }
         }
         throw new RuntimeException("Équipe non trouvée");
     }
+    
+    @GetMapping("/Stats/{id}")
+    public ResponseEntity<String> getTeamStats(@PathVariable int id) {
+
+        try {
+            // Utilisation du circuit breaker pour exécuter la méthode getTeamById
+            return circuitBreaker.executeSupplier(() -> getStatsTeamById(id));
+        } catch (Exception e) {
+            // En cas d'erreur, on appelle la méthode fallback
+            return fallback("Équipe non trouvée");
+        }
+    }
+
+    // Méthode pour obtenir une équipe par son ID
+    private ResponseEntity<String> getStatsTeamById(int id) {
+        for (Team team : listeTeams) {
+            if (team.getId() == id) {
+                Map<String, Object> stats = new HashMap<>();
+                stats.put("name", team.getName());
+                stats.put("nombreDeMatchJoue", team.getNombreDeMatchJoue());
+                stats.put("pointMarque", team.getPointMarque());
+
+                ObjectMapper mapper = new ObjectMapper();
+                String json;
+                try {
+                    json = mapper.writeValueAsString(stats);
+
+                    return new ResponseEntity<>(json, HttpStatus.OK);
+                } catch (JsonProcessingException e) {
+                     e.printStackTrace();
+                    throw new RuntimeException("Nous avons pas réussit à écrire le JSON");
+                   
+                }
+            }
+        }
+        throw new RuntimeException("Équipe non trouvée");
+    }
+
+// communication avec autre services
 
     // Méthode pour obtenir un joueur par son ID
     @GetMapping("/player/{id}")
@@ -106,6 +149,8 @@ public class TeamController {
             throw new RuntimeException("Une erreur inattendue s'est produite");
         }
     }
+
+    
 
     // Méthode pour créer une équipe
     @PostMapping
@@ -142,7 +187,7 @@ public class TeamController {
         for (Team currentTeam : listeTeams) {
             if (currentTeam.getId() == id) {
                 currentTeam.setName(team.getName());
-                return new ResponseEntity<String>(currentTeam.teamName, HttpStatus.OK);
+                return new ResponseEntity<String>(currentTeam.getName(), HttpStatus.OK);
             }
         }
         throw new RuntimeException("Équipe non trouvée");

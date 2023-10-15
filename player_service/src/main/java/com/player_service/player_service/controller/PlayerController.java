@@ -4,6 +4,8 @@ package com.player_service.player_service.controller;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -12,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.player_service.player_service.model.Player;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -25,9 +29,9 @@ public class PlayerController {
 
     // Déclaration du circuit breaker
     private static final CircuitBreaker circuitBreaker;
-    
-	@Autowired
-	RestTemplate restTemplate;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     public PlayerController(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
@@ -85,7 +89,7 @@ public class PlayerController {
             return circuitBreaker.executeSupplier(() -> getPlayerById(id));
         } catch (Exception e) {
             // En cas d'erreur, on appelle la méthode fallback
-            return fallback("Équipe non trouvée");
+            return fallback("Joueur non trouvée");
         }
     }
 
@@ -96,7 +100,45 @@ public class PlayerController {
                 return new ResponseEntity<>(player.getName(), HttpStatus.OK);
             }
         }
-        throw new RuntimeException("Équipe non trouvée");
+        throw new RuntimeException("Joueur non trouvée");
+    }
+
+    @GetMapping("/Stats/{id}")
+    public ResponseEntity<String> getStatsPlayer(@PathVariable int id) {
+
+        try {
+            // Utilisation du circuit breaker pour exécuter la méthode getPlayerById
+            return circuitBreaker.executeSupplier(() -> getStatsPlayerById(id));
+        } catch (Exception e) {
+            // En cas d'erreur, on appelle la méthode fallback
+            return fallback("Joueur non trouvée");
+        }
+    }
+
+    // Méthode pour obtenir une équipe par son ID
+    private ResponseEntity<String> getStatsPlayerById(int id) {
+        for (Player player : listePlayers) {
+            if (player.getId() == id) {
+                Map<String, Object> stats = new HashMap<>();
+                stats.put("name", player.getName());
+                stats.put("nombreDeMatchJoue", player.getNombreDeMatchJoue());
+                stats.put("pointMarque", player.getPointMarque());
+
+                ObjectMapper mapper = new ObjectMapper();
+                String json;
+                try {
+                    json = mapper.writeValueAsString(stats);
+
+                    return new ResponseEntity<>(json, HttpStatus.OK);
+                } catch (JsonProcessingException e) {
+                     e.printStackTrace();
+                    throw new RuntimeException("Nous avons pas réussit à écrire le JSON");
+                   
+                }
+
+            }
+        }
+        throw new RuntimeException("Joueur non trouvé");
     }
 
     // Méthode pour créer une équipe
